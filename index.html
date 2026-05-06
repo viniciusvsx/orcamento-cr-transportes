@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CR Transportes - Orçamento</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f2f2f2;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .topbar button {
+      background: #16324f;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .topbar button:hover {
+      opacity: 0.9;
+    }
+
+    .orcamento {
+      width: 100%;
+      max-width: 1120px;
+      margin: auto;
+      background: white;
+      border: 1px solid #000;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    td, th {
+      border: 1px solid #000;
+      font-size: 12px;
+      padding: 2px 4px;
+      vertical-align: middle;
+    }
+
+    .header td {
+      height: 115px;
+    }
+
+    .logo {
+      width: 150px;
+      text-align: center;
+    }
+
+    .logo-box {
+      width: 140px;
+      height: 105px;
+      background: #1f2a44;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      margin: auto;
+      border-radius: 2px;
+    }
+
+    .logo-box strong {
+      font-size: 28px;
+    }
+
+    .empresa {
+      padding-left: 10px;
+      vertical-align: top;
+    }
+
+    .empresa h1 {
+      margin: 10px 0 0;
+      font-size: 26px;
+      font-weight: normal;
+      letter-spacing: 1px;
+      color: #333;
+    }
+
+    .empresa p {
+      margin: 5px 0;
+      color: #7da0c4;
+      font-style: italic;
+      font-size: 18px;
+    }
+
+    .numero {
+      width: 280px;
+      text-align: center;
+      vertical-align: top;
+    }
+
+    .numero .titulo {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .numero .codigo {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .contatos {
+      width: 250px;
+      font-size: 13px;
+      color: #5c7a96;
+      font-weight: bold;
+      line-height: 20px;
+      padding-top: 15px;
+    }
+
+    .cliente td {
+      height: 23px;
+    }
+
+    .itens th {
+      background: #efefef;
+      text-align: center;
+    }
+
+    .itens td {
+      height: 22px;
+    }
+
+    input, textarea {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 12px;
+      background: transparent;
+    }
+
+    textarea {
+      resize: none;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .right {
+      text-align: right;
+    }
+
+    .rodape td {
+      height: 26px;
+    }
+
+    .assinatura {
+      text-align: center;
+      font-size: 11px;
+      padding: 4px;
+      border-top: 1px solid #000;
+    }
+
+    .controls {
+      width: 100%;
+      max-width: 1120px;
+      margin: 20px auto;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .controls h2 {
+      margin-top: 0;
+      color: #16324f;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .grid div {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .grid label {
+      font-size: 13px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .grid input,
+    .grid textarea {
+      border: 1px solid #ccc;
+      padding: 8px;
+      border-radius: 5px;
+      background: #fff;
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .item-actions button {
+      background: #16324f;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 1024px) {
+      body {
+        padding: 10px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .header td {
+        display: block;
+        width: 100%;
+        text-align: center;
+        height: auto;
+      }
+
+      .empresa {
+        padding: 10px;
+      }
+
+      .numero,
+      .contatos {
+        padding: 10px;
+      }
+
+      .orcamento {
+        overflow-x: auto;
+      }
+
+      table {
+        min-width: 1000px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .topbar button {
+        width: 100%;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        padding: 10px;
+      }
+
+      .empresa h1 {
+        font-size: 22px;
+      }
+
+      .empresa p {
+        font-size: 16px;
+      }
+
+      .numero .titulo,
+      .numero .codigo {
+        font-size: 20px;
+      }
+
+      .contatos {
+        font-size: 12px;
+      }
+    }
+
+    @media print {
+      .acao-coluna,
+      .acao-celula {
+        display: none;
+      }
+
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .controls,
+      .topbar {
+        display: none;
+      }
+
+      .orcamento {
+        width: 100%;
+        border: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <button onclick="adicionarItem()">+ Adicionar Item</button>
+    <button onclick="imprimirOrcamento()">🖨️ Finalizar e Imprimir/PDF</button>
+    <button onclick="limparFormulario()">🗑️ Novo Orçamento</button>
+  </div>
+
+  <div class="controls">
+    <h2>Dados do Orçamento</h2>
+
+    <div class="grid">
+      <div>
+        <label>Número do Orçamento</label>
+        <input type="text" id="numeroOrcamento" value="01053" oninput="syncCampos()">
+      </div>
+
+      <div>
+        <label>Cliente</label>
+        <input type="text" id="cliente" oninput="syncCampos()">
+      </div>
+
+      <div>
+        <label>CPF/CNPJ</label>
+        <input type="text" id="cpf" oninput="syncCampos()">
+      </div>
+
+      <div>
+        <label>Contato</label>
+        <input type="text" id="contato" oninput="syncCampos()">
+      </div>
+
+      <div>
+        <label>Telefone</label>
+        <input type="text" id="telefone" oninput="syncCampos()">
+      </div>
+
+      <div>
+        <label>Endereço</label>
+        <input type="text" id="endereco" oninput="syncCampos()">
+      </div>
+
+      <div>
+        <label>Cidade/Data</label>
+        <input type="text" id="cidadeData" value="" oninput="syncCampos()">
+      </div>
+
+      <div>
+        <label>Observação Geral</label>
+        <textarea id="obsGeral" rows="2" oninput="syncCampos()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="orcamento">
+    <table>
+      <tr class="header">
+        <td class="logo">
+          <img src="logo_nova(2).jpg" alt="CR Transportes" style="width:140px;height:105px;object-fit:cover;">
+        </td>
+
+        <td class="empresa">
+          <h1>CR TRANSPORTES</h1>
+          <p>Transporte Executivo</p>
+        </td>
+
+        <td class="numero">
+          <div class="titulo">ORÇAMENTO Nº</div>
+          <div class="codigo" id="orcamentoNumeroView">01053</div>
+        </td>
+
+        <td class="contatos">
+          (27) 99861-3376<br>
+          (27) 98128-3557<br>
+          @crtransportes.es<br>
+          es.crtransportes@gmail.com
+        </td>
+      </tr>
+    </table>
+
+    <table class="cliente">
+      <tr>
+        <td width="80"><strong>Cliente:</strong></td>
+        <td id="clienteView"></td>
+        <td width="130" class="center"><strong>CPF/CNPJ:</strong></td>
+        <td width="180" id="cpfView"></td>
+        <td width="80"><strong>Contato:</strong></td>
+        <td width="160" id="contatoView"></td>
+      </tr>
+
+      <tr>
+        <td><strong>Endereço:</strong></td>
+        <td colspan="3" id="enderecoView"></td>
+        <td><strong>Telefone:</strong></td>
+        <td id="telefoneView"></td>
+      </tr>
+    </table>
+
+    <table class="itens">
+      <thead>
+        <tr>
+          <th width="60">Item</th>
+          <th width="200">Descrição</th>
+          <th width="120">Data</th>
+          <th width="140">Valor unit (R$)</th>
+          <th width="120">Quantidade</th>
+          <th width="140">Valor total (R$)</th>
+          <th>Observações</th>
+          <th width="50" class="acao-coluna">Ação</th>
+        </tr>
+      </thead>
+
+      <tbody id="tabelaItens">
+      </tbody>
+
+      <tbody id="linhasVazias"></tbody>
+    </table>
+
+    <table class="rodape">
+      <tr>
+        <td width="540"><strong id="cidadeDataView"></strong></td>
+        <td width="150" class="right"><strong>Total:</strong></td>
+        <td width="120" class="right"><strong id="valorTotal">R$ 0,00</strong></td>
+        <td rowspan="3" style="padding: 8px; vertical-align: top;" id="obsGeralView"></td>
+      </tr>
+
+      <tr>
+        <td rowspan="2"></td>
+        <td class="right"><strong>Desconto</strong></td>
+        <td class="right"><strong>R$ 0,00</strong></td>
+      </tr>
+
+      <tr>
+        <td class="right"><strong>Valor total</strong></td>
+        <td class="right"><strong id="valorTotalFinal">R$ 0,00</strong></td>
+      </tr>
+    </table>
+
+    <div class="assinatura">
+      CR TRANSPORTES - CNPJ 33.183.006.0001/09 - E-MAIL: ES.CRTRANSPORTES@GMAIL.COM - (27) 99861-3376 / (27)98128-3557
+    </div>
+  </div>
+
+  <script>
+    let contador = 1;
+
+    function moeda(valor) {
+      return valor.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
+    }
+
+    function adicionarItem() {
+      const tbody = document.getElementById('tabelaItens');
+
+      const tr = document.createElement('tr');
+
+      tr.innerHTML = `
+        <td class="center itemNumero">${String(contador).padStart(2, '0')}</td>
+        <td><input type="text" class="descricao"></td>
+        <td><input type="date" class="data"></td>
+        <td><input type="number" step="0.01" class="valorUnit right" oninput="calcularLinha(this)"></td>
+        <td><input type="number" step="1" value="1" class="quantidade center" oninput="calcularLinha(this)"></td>
+        <td class="right totalLinha">R$ 0,00</td>
+        <td><input type="text" class="observacao"></td>
+        <td class="center acao-celula">
+          <button type="button" onclick="excluirLinha(this)" style="background:#b00020;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;">
+            X
+          </button>
+        </td>
+      `;
+
+      tbody.appendChild(tr);
+      contador++;
+
+      preencherLinhasVazias();
+    }
+
+    function excluirLinha(botao) {
+      const linha = botao.closest('tr');
+      linha.remove();
+
+      reordenarItens();
+      calcularTotalGeral();
+      preencherLinhasVazias();
+    }
+
+    function reordenarItens() {
+      const linhas = document.querySelectorAll('#tabelaItens tr');
+
+      linhas.forEach((linha, index) => {
+        linha.querySelector('.itemNumero').innerText = String(index + 1).padStart(2, '0');
+      });
+
+      contador = linhas.length + 1;
+    }
+
+    function calcularLinha(elemento) {
+      const linha = elemento.closest('tr');
+
+      const valor = parseFloat(linha.querySelector('.valorUnit').value) || 0;
+      const quantidade = parseFloat(linha.querySelector('.quantidade').value) || 0;
+
+      const total = valor * quantidade;
+
+      linha.querySelector('.totalLinha').innerText = moeda(total);
+
+      calcularTotalGeral();
+    }
+
+    function calcularTotalGeral() {
+      const totais = document.querySelectorAll('.totalLinha');
+
+      let soma = 0;
+
+      totais.forEach(item => {
+        const valor = item.innerText
+          .replace('R$', '')
+          .replace(/\./g, '')
+          .replace(',', '.')
+          .trim();
+
+        soma += parseFloat(valor) || 0;
+      });
+
+      document.getElementById('valorTotal').innerText = moeda(soma);
+      document.getElementById('valorTotalFinal').innerText = moeda(soma);
+    }
+
+    function preencherLinhasVazias() {
+      const vazio = document.getElementById('linhasVazias');
+      vazio.innerHTML = '';
+
+      const usadas = document.querySelectorAll('#tabelaItens tr').length;
+      const totalDesejado = 18;
+
+      for (let i = usadas; i < totalDesejado; i++) {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          <td>&nbsp;</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        `;
+
+        vazio.appendChild(tr);
+      }
+    }
+
+    function definirCidadeDataAtual() {
+      const hoje = new Date();
+
+      const dataFormatada = hoje.toLocaleDateString('pt-BR');
+
+      const valor = `Serra/ES: ${dataFormatada}`;
+
+      document.getElementById('cidadeData').value = valor;
+      document.getElementById('cidadeDataView').innerText = valor;
+    }
+
+    function imprimirOrcamento() {
+      syncCampos();
+      window.print();
+    }
+
+    function syncCampos() {
+      document.getElementById('orcamentoNumeroView').innerText = document.getElementById('numeroOrcamento').value;
+      document.getElementById('clienteView').innerText = document.getElementById('cliente').value;
+      document.getElementById('cpfView').innerText = document.getElementById('cpf').value;
+      document.getElementById('contatoView').innerText = document.getElementById('contato').value;
+      document.getElementById('telefoneView').innerText = document.getElementById('telefone').value;
+      document.getElementById('enderecoView').innerText = document.getElementById('endereco').value;
+      document.getElementById('cidadeDataView').innerText = document.getElementById('cidadeData').value;
+      document.getElementById('obsGeralView').innerText = document.getElementById('obsGeral').value;
+    }
+
+    function limparFormulario() {
+      if (!confirm('Deseja realmente iniciar um novo orçamento?')) return;
+
+      document.getElementById('cliente').value = '';
+      document.getElementById('cpf').value = '';
+      document.getElementById('contato').value = '';
+      document.getElementById('telefone').value = '';
+      document.getElementById('endereco').value = '';
+      document.getElementById('obsGeral').value = '';
+
+      document.getElementById('tabelaItens').innerHTML = '';
+
+      contador = 1;
+
+      calcularTotalGeral();
+      preencherLinhasVazias();
+      syncCampos();
+    }
+
+    preencherLinhasVazias();
+    adicionarItem();
+    definirCidadeDataAtual();
+    syncCampos();
+  </script>
+</body>
+</html>
