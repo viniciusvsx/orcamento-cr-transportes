@@ -194,7 +194,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 10px;
     }
 
@@ -330,15 +330,15 @@
 <body>
 
   <div class="topbar">
-    <button onclick="adicionarItem()">+ Adicionar Item</button>
-    <button onclick="imprimirOrcamento()">🖨️ Finalizar e Imprimir/PDF</button>
+    <button onclick="abrirModalItem()">+ Adicionar Item</button>
+    <button onclick="confirmarOrcamento()">✅ Confirmar Orçamento</button>
     <button onclick="limparFormulario()">🗑️ Novo Orçamento</button>
   </div>
 
   <div class="controls">
     <h2>Dados do Orçamento</h2>
 
-    <div class="grid">
+    <div class="grid" style="align-items:start;">
       <div>
         <label>Número do Orçamento</label>
         <input type="text" id="numeroOrcamento" value="01053" oninput="syncCampos()">
@@ -379,6 +379,72 @@
         <textarea id="obsGeral" rows="2" oninput="syncCampos()"></textarea>
       </div>
     </div>
+
+    <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button onclick="abrirModalItem()" style="background:#16324f;color:#fff;border:none;padding:12px 18px;border-radius:6px;cursor:pointer;font-weight:bold;">
+        + Novo Item
+      </button>
+    </div>
+
+    <div id="listaBackend" style="margin-top:20px;overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="background:#16324f;color:#fff;">
+            <th style="padding:10px;border:1px solid #ccc;">#</th>
+            <th style="padding:10px;border:1px solid #ccc;">Descrição</th>
+            <th style="padding:10px;border:1px solid #ccc;">Quantidade</th>
+            <th style="padding:10px;border:1px solid #ccc;">Valor Unit.</th>
+            <th style="padding:10px;border:1px solid #ccc;">Total</th>
+            <th style="padding:10px;border:1px solid #ccc;">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="itensBackend"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="modalItem" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999;align-items:center;justify-content:center;padding:20px;overflow:auto;">
+    <div style="background:#fff;width:100%;max-width:700px;border-radius:10px;padding:20px;max-height:95vh;overflow:auto;">
+      <h2 style="margin-top:0;color:#16324f;">Lançar Item</h2>
+
+      <div class="grid" style="align-items:start;">
+        <div>
+          <label>Descrição</label>
+          <input type="text" id="modalDescricao">
+        </div>
+
+        <div>
+          <label>Data</label>
+          <input type="date" id="modalData">
+        </div>
+
+        <div>
+          <label>Quantidade</label>
+          <input type="number" id="modalQuantidade" value="1">
+        </div>
+
+        <div>
+          <label>Valor Unitário</label>
+          <input type="number" step="0.01" id="modalValor">
+        </div>
+      </div>
+
+      <div style="margin-top:15px;">
+        <label>Observação</label>
+        <textarea id="modalObservacao" rows="3" style="border:1px solid #ccc;padding:10px;border-radius:5px;background:#fff;"></textarea>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
+        <button onclick="fecharModalItem()" style="background:#777;color:#fff;border:none;padding:10px 15px;border-radius:5px;cursor:pointer;">
+          Cancelar
+        </button>
+
+        <button onclick="salvarItem()" style="background:#16324f;color:#fff;border:none;padding:10px 15px;border-radius:5px;cursor:pointer;">
+          Salvar Item
+        </button>
+      </div>
+    </div>
+  </div>
   </div>
 
   <div class="orcamento">
@@ -472,6 +538,7 @@
 
   <script>
     let contador = 1;
+    let itens = [];
 
     function moeda(valor) {
       return valor.toLocaleString('pt-BR', {
@@ -480,29 +547,99 @@
       });
     }
 
-    function adicionarItem() {
+    function abrirModalItem() {
+      document.getElementById('modalItem').style.display = 'flex';
+    }
+
+    function fecharModalItem() {
+      document.getElementById('modalItem').style.display = 'none';
+    }
+
+    function salvarItem() {
+      const descricao = document.getElementById('modalDescricao').value.trim();
+
+      if (!descricao) {
+        alert('Informe a descrição do item.');
+        return;
+      }
+
+      const item = {
+        descricao: document.getElementById('modalDescricao').value,
+        data: document.getElementById('modalData').value,
+        quantidade: parseFloat(document.getElementById('modalQuantidade').value) || 0,
+        valor: parseFloat(document.getElementById('modalValor').value) || 0,
+        observacao: document.getElementById('modalObservacao').value
+      };
+
+      itens.push(item);
+
+      atualizarBackend();
+      montarRelatorio();
+
+      fecharModalItem();
+      limparModal();
+    }
+
+    function limparModal() {
+      document.getElementById('modalDescricao').value = '';
+      document.getElementById('modalData').value = '';
+      document.getElementById('modalQuantidade').value = 1;
+      document.getElementById('modalValor').value = '';
+      document.getElementById('modalObservacao').value = '';
+    }
+
+    function atualizarBackend() {
+      const tbody = document.getElementById('itensBackend');
+      tbody.innerHTML = '';
+
+      itens.forEach((item, index) => {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          <td style="border:1px solid #ccc;padding:8px;text-align:center;">${String(index + 1).padStart(2, '0')}</td>
+          <td style="border:1px solid #ccc;padding:8px;">${item.descricao}</td>
+          <td style="border:1px solid #ccc;padding:8px;text-align:center;">${item.quantidade}</td>
+          <td style="border:1px solid #ccc;padding:8px;text-align:right;">${moeda(item.valor)}</td>
+          <td style="border:1px solid #ccc;padding:8px;text-align:right;">${moeda(item.valor * item.quantidade)}</td>
+          <td style="border:1px solid #ccc;padding:8px;text-align:center;">
+            <button onclick="removerItem(${index})" style="background:#b00020;color:#fff;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;">
+              Excluir
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function removerItem(index) {
+      itens.splice(index, 1);
+      atualizarBackend();
+      montarRelatorio();
+    }
+
+    function montarRelatorio() {
       const tbody = document.getElementById('tabelaItens');
+      tbody.innerHTML = '';
 
-      const tr = document.createElement('tr');
+      itens.forEach((item, index) => {
+        const tr = document.createElement('tr');
 
-      tr.innerHTML = `
-        <td class="center itemNumero">${String(contador).padStart(2, '0')}</td>
-        <td><input type="text" class="descricao"></td>
-        <td><input type="date" class="data"></td>
-        <td><input type="number" step="0.01" class="valorUnit right" oninput="calcularLinha(this)"></td>
-        <td><input type="number" step="1" value="1" class="quantidade center" oninput="calcularLinha(this)"></td>
-        <td class="right totalLinha">R$ 0,00</td>
-        <td><input type="text" class="observacao"></td>
-        <td class="center acao-celula">
-          <button type="button" onclick="excluirLinha(this)" style="background:#b00020;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;">
-            X
-          </button>
-        </td>
-      `;
+        tr.innerHTML = `
+          <td class="center itemNumero">${String(index + 1).padStart(2, '0')}</td>
+          <td>${item.descricao}</td>
+          <td class="center">${item.data || ''}</td>
+          <td class="right">${moeda(item.valor)}</td>
+          <td class="center">${item.quantidade}</td>
+          <td class="right totalLinha">${moeda(item.valor * item.quantidade)}</td>
+          <td>${item.observacao}</td>
+          <td class="acao-celula"></td>
+        `;
 
-      tbody.appendChild(tr);
-      contador++;
+        tbody.appendChild(tr);
+      });
 
+      calcularTotalGeral();
       preencherLinhasVazias();
     }
 
@@ -592,9 +729,13 @@
       document.getElementById('cidadeDataView').innerText = valor;
     }
 
-    function imprimirOrcamento() {
+    function confirmarOrcamento() {
       syncCampos();
-      window.print();
+      montarRelatorio();
+
+      setTimeout(() => {
+        window.print();
+      }, 300);
     }
 
     function syncCampos() {
@@ -609,6 +750,8 @@
     }
 
     function limparFormulario() {
+      itens = [];
+      atualizarBackend();
       if (!confirm('Deseja realmente iniciar um novo orçamento?')) return;
 
       document.getElementById('cliente').value = '';
@@ -628,7 +771,6 @@
     }
 
     preencherLinhasVazias();
-    adicionarItem();
     definirCidadeDataAtual();
     syncCampos();
   </script>
